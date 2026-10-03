@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BRP System • Meta + Cronometro</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #0a0f1a;
+  --card: #131a2b;
+  --card2: #1a2338;
+  --border: #2a3550;
+  --green: #22e58a;
+  --green-dark: #0fb86a;
+  --purple: #a855f7;
+  --blue: #3b82f6;
+  --gold: #fbbf24;
+  --red: #ef4444;
+  --white: #f1f5f9;
+  --muted: #7d8aa5;
+}
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  min-height: 100vh;
+  padding: 16px;
+  padding-bottom: 100px;
+  background-image:
+    radial-gradient(circle at 15% 0%, rgba(34,229,138,0.10), transparent 40%),
+    radial-gradient(circle at 85% 10%, rgba(168,85,247,0.10), transparent 40%),
+    radial-gradient(circle at 50% 100%, rgba(59,130,246,0.08), transparent 50%);
+}
+.container { max-width: 760px; margin: 0 auto; }
+
+/* HEADER */
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 16px;
+}
+.logo {
+  font-size: 22px; font-weight: 900; letter-spacing: 1px;
+  background: linear-gradient(90deg, var(--green), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.clock { font-size: 13px; color: var(--muted); font-weight: 600; }
+
+/* HERO CARD */
+.hero {
+  background: linear-gradient(145deg, var(--card), var(--card2));
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 24px;
+  margin-bottom: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; top: -50%; right: -20%;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(34,229,138,0.15), transparent 70%);
+  pointer-events: none;
+}
+.hero-label { font-size: 12px; color: var(--green); font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+.hero-title { font-size: 20px; margin: 6px 0 14px; font-weight: 800; }
+.hero-total {
+  font-size: 38px; font-weight: 900;
+  background: linear-gradient(90deg, var(--green), #4ade80);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 16px;
+}
+.progress-track {
+  height: 14px; background: #0a1020; border-radius: 99px;
+  overflow: hidden; border: 1px solid var(--border);
+}
+.progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--green-dark), var(--green), var(--gold));
+  border-radius: 99px;
+  transition: width 0.5s ease;
+  box-shadow: 0 0 20px rgba(34,229,138,0.5);
+}
+.progress-info {
+  display: flex; justify-content: space-between;
+  font-size: 13px; color: var(--muted); margin-top: 8px; font-weight: 600;
+}
+
+/* STATS GRID */
+.stats {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px;
+}
+@media (min-width: 600px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+.stat-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 14px;
+  transition: transform 0.2s;
+}
+.stat-card:hover { transform: translateY(-2px); border-color: var(--green); }
+.stat-label { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 20px; font-weight: 900; margin-top: 4px; }
+.c-green { color: var(--green); }
+.c-gold { color: var(--gold); }
+.c-blue { color: var(--blue); }
+.c-purple { color: var(--purple); }
+
+/* SECTIONS */
+.section-title {
+  font-size: 16px; font-weight: 800; margin: 22px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-title .dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 10px var(--green);
+}
+
+/* CARDS */
+.panel {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 18px; padding: 18px; margin-bottom: 12px;
+}
+input, select {
+  width: 100%; background: #0d1424; border: 1px solid var(--border);
+  color: var(--white); padding: 14px; border-radius: 12px;
+  margin: 6px 0; font-size: 15px; outline: none;
+  transition: border-color 0.2s;
+}
+input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(34,229,138,0.15); }
+button {
+  width: 100%; padding: 14px; border: none; border-radius: 12px;
+  font-weight: 800; font-size: 15px; cursor: pointer;
+  transition: all 0.2s; margin-top: 6px;
+}
+button:active { transform: scale(0.97); }
+.btn-primary {
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  color: #052e16; box-shadow: 0 4px 20px rgba(34,229,138,0.3);
+}
+.btn-primary:hover { box-shadow: 0 6px 25px rgba(34,229,138,0.5); }
+.btn-secondary { background: var(--card2); color: var(--white); border: 1px solid var(--border); }
+.btn-gold { background: linear-gradient(135deg, #d97706, var(--gold)); color: #451a03; }
+.btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+.btn-purple { background: linear-gradient(135deg, #7c3aed, var(--purple)); color: white; box-shadow: 0 4px 20px rgba(168,85,247,0.3); }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+.hint { font-size: 12px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+
+/* GAME TIMER */
+.timer-display {
+  text-align: center; padding: 20px 0;
+}
+.timer-time {
+  font-size: 56px; font-weight: 900; font-family: 'Courier New', monospace;
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, var(--purple), var(--blue), var(--green));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.timer-label { font-size: 13px; color: var(--muted); margin-top: 6px; font-weight: 600; }
+.timer-warning {
+  margin-top: 12px; padding: 10px; border-radius: 10px;
+  background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3);
+  color: var(--gold); font-size: 13px; font-weight: 700; display: none;
+}
+.timer-warning.show { display: block; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+/* JOB LIST */
+.job-list { display: grid; gap: 8px; margin-top: 10px; }
+.job-item {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #0d1424; border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px;
+}
+.job-item-name { font-weight: 700; font-size: 14px; }
+.job-item-val { font-size: 12px; color: var(--green); font-weight: 700; }
+.job-del {
+  width: auto; padding: 6px 10px; margin: 0; font-size: 11px;
+  background: transparent; color: var(--red); border: 1px solid rgba(239,68,68,0.3);
+}
+
+/* ROUTINE */
+.routine { display: grid; gap: 6px; margin-top: 10px; }
+.routine-item {
+  display: grid; grid-template-columns: 75px 1fr auto; gap: 10px;
+  align-items: center; background: #0d1424; border: 1px solid var(--border);
+  border-radius: 10px; padding: 10px 12px; font-size: 13px;
+}
+.routine-time { color: var(--muted); font-weight: 700; font-size: 12px; }
+.routine-name { font-weight: 700; }
+.routine-pay { color: var(--green); font-size: 11px; font-weight: 700; }
+
+/* HISTORY */
+.history-list { display: grid; gap: 8px; margin-top: 10px; }
+.history-item {
+  background: #0d1424; border: 1px solid var(--border);
+  border-radius: 12px; padding: 12px 14px;
+  animation: slideIn 0.3s ease;
+}
+@keyframes slideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.history-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+.history-name { font-weight: 700; font-size: 14px; }
+.history-amount { font-weight: 900; color: var(--green); }
+.history-meta { font-size: 11px; color: var(--muted); }
+.empty { text-align: center; color: var(--muted); padding: 30px; font-size: 14px; }
+
+/* TABS */
+.tab-page { display: none; }
+.tab-page.active { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* BOTTOM NAV */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: rgba(10,15,26,0.95); backdrop-filter: blur(20px);
+  border-top: 1px solid var(--border); padding: 8px 6px;
+}
+.nav-inner { max-width: 760px; margin: 0 auto; display: flex; gap: 3px; overflow-x: auto; }
+.nav-btn {
+  flex: 1; min-width: 62px; background: transparent; border: none;
+  color: var(--muted); padding: 8px 4px; border-radius: 12px;
+  font-size: 9px; font-weight: 800; margin: 0; width: auto;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.nav-btn .ico { font-size: 18px; }
+.nav-btn.active { background: rgba(34,229,138,0.12); color: var(--green); }
+
+/* METAL ROUTE CALCULATOR */
+.metals-banner { background: linear-gradient(135deg, rgba(251,191,36,.18), rgba(34,229,138,.09), var(--card)); }
+.metals-banner .sales-banner-icon { filter: drop-shadow(0 0 16px rgba(251,191,36,.45)); }
+.metal-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.metal-field label { display: block; color: var(--muted); font-size: 11px; font-weight: 800; margin: 8px 0 2px; }
+.metal-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-top: 14px; }
+.metal-result { background: linear-gradient(145deg, #1d2a35, var(--card)); border: 1px solid #4a4936; border-radius: 16px; padding: 16px; }
+.metal-result-label { color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; }
+.metal-result-value { color: var(--gold); font-size: 25px; font-weight: 900; margin: 7px 0 3px; }
+.metal-result-note { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.metal-explanation { margin-top: 12px; padding: 12px; border-radius: 12px; background: rgba(251,191,36,.08); color: #e8d8a5; font-size: 12px; line-height: 1.5; }
+@media (max-width: 480px) { .metal-form-grid { grid-template-columns: 1fr; } }
+
+/* SALES TABS */
+.sales-banner {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px;
+  border: 1px solid var(--border); border-radius: 20px; padding: 20px;
+  margin-bottom: 14px; overflow: hidden; position: relative;
+}
+.weapons-banner { background: linear-gradient(135deg, rgba(168,85,247,.2), rgba(59,130,246,.12), var(--card)); }
+.drugs-banner { background: linear-gradient(135deg, rgba(34,229,138,.18), rgba(59,130,246,.12), var(--card)); }
+.sales-banner-copy { position: relative; z-index: 1; }
+.sales-eyebrow { color: var(--green); font-size: 11px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase; }
+.sales-banner h3 { font-size: 20px; margin: 5px 0 6px; }
+.sales-banner p { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.sales-banner-icon { font-size: 42px; filter: drop-shadow(0 0 16px rgba(168,85,247,.45)); }
+.sales-pill { display: inline-block; margin-top: 10px; padding: 6px 10px; border-radius: 99px;
+  background: rgba(34,229,138,.12); color: var(--green); font-size: 11px; font-weight: 800; }
+.sales-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 12px; }
+.sale-card { background: linear-gradient(155deg, var(--card2), var(--card)); border: 1px solid var(--border);
+  border-radius: 18px; padding: 16px; position: relative; overflow: hidden; }
+.sale-card::after { content: ''; position: absolute; width: 120px; height: 120px; right: -55px; top: -55px;
+  border-radius: 50%; background: rgba(168,85,247,.1); pointer-events: none; }
+.sale-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; position: relative; z-index: 1; }
+.sale-icon { font-size: 28px; }
+.sale-tag { color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .6px; }
+.sale-name { font-size: 19px; font-weight: 900; margin-top: 3px; }
+.sale-price { color: var(--green); font-size: 25px; font-weight: 900; margin: 15px 0 2px; }
+.sale-unit { color: var(--muted); font-size: 12px; }
+.sale-controls { display: grid; grid-template-columns: 86px 1fr; gap: 8px; align-items: end; margin-top: 12px; }
+.sale-controls label { display: block; color: var(--muted); font-size: 10px; font-weight: 800; margin: 0 0 2px 2px; }
+.sale-qty { text-align: center; margin: 0; padding: 12px 6px; }
+.sale-total { color: var(--muted); font-size: 11px; margin-top: 9px; }
+.sale-total strong { color: var(--white); }
+.drug-empty { background: linear-gradient(145deg, var(--card), #12251f); border: 1px dashed #345648;
+  border-radius: 18px; padding: 26px 20px; text-align: center; }
+.drug-empty-icon { font-size: 34px; margin-bottom: 8px; }
+.drug-empty h3 { font-size: 16px; margin-bottom: 7px; }
+.drug-empty p { color: var(--muted); font-size: 13px; line-height: 1.55; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 100px; left: 50%; z-index: 100;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, var(--green-dark), var(--green));
+  color: #052e16; padding: 12px 22px; border-radius: 14px;
+  font-weight: 800; font-size: 14px; opacity: 0; pointer-events: none;
+  transition: all 0.3s; box-shadow: 0 10px 40px rgba(34,229,138,0.4);
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.warn { background: linear-gradient(135deg, #d97706, var(--gold)); color: #451a03; }
+
+/* MODAL */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: none; align-items: center; justify-content: center; z-index: 200; padding: 20px;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 24px; width: 100%; max-width: 400px;
+}
+.modal h3 { margin-bottom: 16px; font-size: 18px; }
+.balance-modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.balance-modal-heading { display:flex; align-items:center; gap:12px; }
+.balance-modal-icon { width:46px; height:46px; display:grid; place-items:center; border-radius:14px;
+  background:rgba(34,229,138,.12); color:var(--green); font-size:23px; }
+.balance-modal h3 { margin:0; }
+.balance-modal-subtitle { color:var(--muted); font-size:12px; margin-top:4px; }
+.balance-close { width:36px; padding:6px; margin:0; border-radius:10px; background:var(--card2); color:var(--muted); font-size:20px; }
+.balance-current { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; margin:12px 0 14px;
+  background:#0d1424; border:1px solid var(--border); border-radius:14px; }
+.balance-current span { color:var(--muted); font-size:12px; font-weight:700; }
+.balance-current strong { color:var(--green); font-size:19px; }
+.balance-input-label { display:block; color:var(--white); font-size:13px; font-weight:800; margin:8px 0 4px; }
+.balance-modal .btn-row { margin-top:14px; }
+.balance-modal .btn-row button { margin-top:0; }
+</style>
+</head>
+<body>
+<div class="container">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">BRP SYSTEM</div>
+    <div class="clock" id="clock">--:--</div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label" id="hero-label">Bem-vindo</div>
+    <div class="hero-title" id="hero-title">Defina sua Meta</div>
+    <div class="hero-total" id="hero-total">R$ 0</div>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+    <div class="progress-info">
+      <span id="progress-pct">0%</span>
+      <span id="meta-info">Defina abaixo</span>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat-card">
+      <div class="stat-label">Banco</div>
+      <div class="stat-value c-green" id="stat-bank">R$ 0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Na Mao</div>
+      <div class="stat-value c-gold" id="stat-cash">R$ 0</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Falta</div>
+      <div class="stat-value c-blue" id="stat-missing">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Ganho</div>
+      <div class="stat-value c-purple" id="stat-earned">R$ 0</div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: INICIO ============ -->
+  <div id="page-home" class="tab-page active">
+    <div class="section-title"><span class="dot"></span>Definir Meta</div>
+    <div class="panel">
+      <input type="number" id="meta-input" placeholder="Valor da sua meta (R$)">
+      <button class="btn-primary" onclick="saveMeta()">Salvar Meta</button>
+    </div>
+
+    <div class="section-title"><span class="dot"></span>Registro Rapido</div>
+    <div class="panel">
+      <select id="quick-job"></select>
+      <input type="number" id="quick-amount" placeholder="Valor recebido (R$)">
+      <input type="text" id="quick-note" placeholder="Observacao (opcional)">
+      <button class="btn-primary" onclick="quickRegister()">Registrar Ganho</button>
+    </div>
+
+    <div class="section-title"><span class="dot"></span>Dinheiro</div>
+    <div class="panel">
+      <input type="number" id="deposit-input" placeholder="Valor para depositar">
+      <button class="btn-secondary" onclick="doDeposit()">Mao -> Banco</button>
+      <hr>
+      <div class="btn-row">
+        <button class="btn-gold" onclick="adjustCash()">Ajustar Mao</button>
+        <button class="btn-secondary" onclick="adjustBank()">Ajustar Banco</button>
+      </div>
+    </div>
+
+    <div class="section-title"><span class="dot"></span>Rotina Sugerida</div>
+    <div class="panel">
+      <div class="routine" id="routine-list"></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: EMPREGOS ============ -->
+  <div id="page-jobs" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Seus Empregos</div>
+    <div class="panel">
+      <div class="job-list" id="job-list"></div>
+    </div>
+    <div class="section-title"><span class="dot"></span>Adicionar Novo Emprego</div>
+    <div class="panel">
+      <input type="text" id="new-job-name" placeholder="Nome do emprego (ex: Pedreiro)">
+      <input type="text" id="new-job-value" placeholder="Valor (ex: R$ 150/dia ou Variavel)">
+      <button class="btn-purple" onclick="addJob()">Adicionar Emprego</button>
+      <div class="hint">Dica: empregos adicionados aparecem no registro rapido automaticamente.</div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: CRONOMETRO ============ -->
+  <div id="page-timer" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Cronometro de Jogo</div>
+    <div class="panel">
+      <div class="timer-display">
+        <div class="timer-time" id="timer-display">00:00:00</div>
+        <div class="timer-label" id="timer-status">Pronto para iniciar</div>
+        <div class="timer-warning" id="timer-warning">
+          ATENCAO: Voce ja jogou 1 HORA! Va trabalhar!
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" id="timer-start-btn" onclick="startTimer()">Iniciar</button>
+        <button class="btn-secondary" onclick="pauseTimer()">Pausar</button>
+      </div>
+      <button class="btn-danger" onclick="resetTimer()">Zerar Cronometro</button>
+      <div class="hint">
+        Como funciona: clique em INICIAR quando comecar a jogar. O cronometro conta o tempo.
+        Quando completar 1 HORA, o sistema avisa com som e mensagem!
+      </div>
+      <hr>
+      <div class="section-title" style="margin-top:0"><span class="dot"></span>Sessoes de Hoje</div>
+      <div class="history-list" id="sessions-list"></div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: REGISTRO ============ -->
+  <div id="page-register" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Registrar por Emprego</div>
+    <div class="panel">
+      <select id="reg-job-select"></select>
+      <input type="number" id="reg-amount" placeholder="Valor recebido (R$)">
+      <input type="text" id="reg-note" placeholder="Observacao (opcional)">
+      <button class="btn-primary" onclick="registerByJob()">Registrar</button>
+    </div>
+    <div class="section-title"><span class="dot"></span>Astronauta (R$ 6.900/h → Banco)</div>
+    <div class="panel">
+      <input type="number" step="0.1" id="astro-hours" placeholder="Horas trabalhadas">
+      <button class="btn-primary" onclick="registerAstro()">Calcular e Registrar → Banco</button>
+    </div>
+    <div class="section-title"><span class="dot"></span>Mecanico</div>
+    <div class="panel">
+      <div class="btn-row">
+        <button class="btn-primary" onclick="fixedRegister('Mecanico Blindado', 2000)">+R$ 2.000 Blindado</button>
+        <button class="btn-secondary" onclick="fixedRegister('Mecanico Normal', 1000)">+R$ 1.000 Normal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: ARMAS ============ -->
+  <div id="page-weapons" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Vendas de armas</div>
+    <div class="sales-banner weapons-banner">
+      <div class="sales-banner-copy">
+        <div class="sales-eyebrow">Catálogo • BRP</div>
+        <h3>Armas</h3>
+        <p>Escolha a quantidade e registre a venda. Os preços são por unidade.</p>
+        <span class="sales-pill">Cada item = 1 unidade</span>
+      </div>
+      <div class="sales-banner-icon">🎯</div>
+    </div>
+    <div class="sales-grid" id="weapons-grid"></div>
+  </div>
+
+  <!-- ============ TAB: DROGAS ============ -->
+  <div id="page-drugs" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Vendas de drogas</div>
+    <div class="sales-banner drugs-banner">
+      <div class="sales-banner-copy">
+        <div class="sales-eyebrow">Catálogo • BRP</div>
+        <h3>Drogas</h3>
+        <p>A aba está pronta para receber os produtos e valores da sua tabela.</p>
+        <span class="sales-pill">Cadastro por unidade</span>
+      </div>
+      <div class="sales-banner-icon">🌿</div>
+    </div>
+    <div class="sales-grid" id="drugs-grid"></div>
+  </div>
+
+  <!-- ============ TAB: ROTA DE METAIS ============ -->
+  <div id="page-metals" class="tab-page">
+    <div class="section-title"><span class="dot"></span>Rota de metais</div>
+    <div class="sales-banner metals-banner">
+      <div class="sales-banner-copy">
+        <div class="sales-eyebrow">Calculadora da org</div>
+        <h3>Planeje suas rotas</h3>
+        <p>Veja quantas rotas precisa fazer para chegar ao valor desejado.</p>
+        <span class="sales-pill">VIP Ouro: 800 metais por rota</span>
+      </div>
+      <div class="sales-banner-icon">🪙</div>
+    </div>
+    <div class="panel">
+      <div class="metal-form-grid">
+        <div class="metal-field">
+          <label for="metal-vip">VIP da org</label>
+          <select id="metal-vip" onchange="updateMetalVip()">
+            <option value="gold">VIP Ouro — 800 metais por rota</option>
+            <option value="custom">Outro VIP — informar pagamento</option>
+          </select>
+        </div>
+        <div class="metal-field" id="metal-custom-row" style="display:none">
+          <label for="metal-custom-pay">Metais recebidos por rota</label>
+          <input type="number" id="metal-custom-pay" min="1" step="1" placeholder="Ex.: 1.200" oninput="calculateMetalRoutes()">
+        </div>
+        <div class="metal-field">
+          <label for="metal-target">Meta desejada de metais</label>
+          <input type="number" id="metal-target" min="1" step="1" placeholder="Ex.: 10.000" oninput="calculateMetalRoutes()">
+        </div>
+        <div class="metal-field">
+          <label for="metal-route-count">Quantidade de rotas planejadas</label>
+          <input type="number" id="metal-route-count" min="1" step="1" placeholder="Ex.: 10" oninput="calculateMetalRoutes()">
+        </div>
+      </div>
+      <button class="btn-gold" onclick="calculateMetalRoutes()">Calcular rotas</button>
+      <div class="metal-results">
+        <div class="metal-result">
+          <div class="metal-result-label">Rotas para atingir a meta</div>
+          <div class="metal-result-value" id="metal-needed">—</div>
+          <div class="metal-result-note" id="metal-needed-note">Informe o valor desejado.</div>
+        </div>
+        <div class="metal-result">
+          <div class="metal-result-label">Total com as rotas planejadas</div>
+          <div class="metal-result-value" id="metal-planned-total">—</div>
+          <div class="metal-result-note" id="metal-planned-note">Informe quantas rotas pretende fazer.</div>
+        </div>
+      </div>
+      <div class="metal-explanation">O cálculo arredonda para cima, porque as rotas são inteiras. Esta calculadora só estima o total; ela não altera seus saldos.</div>
+    </div>
+  </div>
+
+  <!-- ============ TAB: HISTORICO ============ -->
+  <div id="page-history" class="tab-page">
+    <div class="section-title" style="justify-content:space-between">
+      <span style="display:flex;align-items:center;gap:8px"><span class="dot"></span>Historico</span>
+      <button class="btn-danger" style="width:auto;padding:8px 14px;font-size:12px" onclick="clearHistory()">Limpar</button>
+    </div>
+    <div class="history-list" id="history-list"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" data-page="home"><span class="ico">🏠</span>Inicio</button>
+    <button class="nav-btn" data-page="jobs"><span class="ico">💼</span>Empregos</button>
+    <button class="nav-btn" data-page="timer"><span class="ico">🎮</span>Jogo</button>
+    <button class="nav-btn" data-page="register"><span class="ico">➕</span>Registrar</button>
+    <button class="nav-btn" data-page="weapons"><span class="ico">🎯</span>Armas</button>
+    <button class="nav-btn" data-page="drugs"><span class="ico">🌿</span>Drogas</button>
+    <button class="nav-btn" data-page="metals"><span class="ico">🪙</span>Metais</button>
+    <button class="nav-btn" data-page="history"><span class="ico">📜</span>Historico</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Registrado!</div>
+
+<div class="modal-overlay" id="balance-modal" role="dialog" aria-modal="true" aria-labelledby="balance-modal-title">
+  <div class="modal balance-modal">
+    <div class="balance-modal-header">
+      <div class="balance-modal-heading">
+        <div class="balance-modal-icon" id="balance-modal-icon">💵</div>
+        <div>
+          <h3 id="balance-modal-title">Ajustar saldo</h3>
+          <div class="balance-modal-subtitle" id="balance-modal-subtitle">Atualize o valor disponível.</div>
+        </div>
+      </div>
+      <button class="balance-close" type="button" aria-label="Fechar" onclick="closeBalanceModal()">×</button>
+    </div>
+    <div class="balance-current"><span>Saldo atual</span><strong id="balance-current-value">R$ 0</strong></div>
+    <label class="balance-input-label" for="balance-input">Novo valor (R$)</label>
+    <input type="number" id="balance-input" min="0" step="0.01" placeholder="Digite o novo saldo">
+    <div class="hint">Este ajuste substitui o saldo atual; não é um depósito.</div>
+    <div class="btn-row">
+      <button class="btn-secondary" type="button" onclick="closeBalanceModal()">Cancelar</button>
+      <button class="btn-primary" type="button" onclick="saveBalanceAdjustment()">Salvar ajuste</button>
+    </div>
+  </div>
+</div>
+
+<audio id="alarm-sound" preload="auto">
+  <source src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" type="audio/wav">
+</audio>
+
+<script>
+var STORAGE_KEY = 'brp_system_v3';
+
+// Default jobs
+var DEFAULT_JOBS = [
+  { name: 'Astronauta', value: 'R$ 6.900/h' },
+  { name: 'SAMU', value: 'Variavel' },
+  { name: 'Mecanico', value: 'R$ 1k / R$ 2k' },
+  { name: 'Lixeiro', value: 'Variavel' },
+  { name: 'Motorista de Jato', value: 'Variavel' },
+  { name: 'Instalador de Internet', value: 'Variavel' },
+  { name: 'DNIT', value: 'Variavel' },
+  { name: 'Outro', value: 'Variavel' }
+];
+
+var DEFAULT_ROUTINE = [
+  { time: '06-07', name: 'Astronauta', pay: 'R$ 6.900/h' },
+  { time: '07-09', name: 'SAMU', pay: 'variavel' },
+  { time: '09-10', name: 'Astronauta', pay: 'R$ 6.900/h' },
+  { time: '10-12', name: 'Mecanico', pay: 'R$ 1k / 2k' },
+  { time: '12-13', name: 'Astronauta', pay: 'R$ 6.900/h' },
+  { time: '13-15', name: 'Lixeiro', pay: 'variavel' },
+  { time: '15-16', name: 'Instalador Net', pay: 'variavel' },
+  { time: '16-18', name: 'SAMU', pay: 'variavel' },
+  { time: '18-19', name: 'Astronauta', pay: 'R$ 6.900/h' },
+  { time: '19-21', name: 'DNIT', pay: 'variavel' },
+  { time: '21-22', name: 'Mecanico', pay: 'R$ 2k blindado' }
+];
+
+var WEAPON_PRODUCTS = [
+  { name: 'Desert', price: 18000, type: 'Pistola', icon: '🔫' },
+  { name: 'M4', price: 25000, type: 'Rifle', icon: '🎯' },
+  { name: 'Shotgun', price: 25000, type: 'Escopeta', icon: '💥' }
+];
+var DRUG_PRODUCTS = []; // Preenchido quando a tabela de preços for enviada.
+
+var state = {
+  bank: 0, cash: 0, meta: null, earned: 0,
+  history: [], jobs: JSON.parse(JSON.stringify(DEFAULT_JOBS)),
+  timerSeconds: 0, timerRunning: false, timerInterval: null,
+  sessions: [], hourAlerted: false
+};
+
+try {
+  var saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    var parsed = JSON.parse(saved);
+    for (var k in parsed) { if (parsed.hasOwnProperty(k)) state[k] = parsed[k]; }
+  }
+} catch(e) {}
+
+if (!state.jobs || state.jobs.length === 0) state.jobs = JSON.parse(JSON.stringify(DEFAULT_JOBS));
+if (!state.sessions) state.sessions = [];
+if (typeof state.hourAlerted === 'undefined') state.hourAlerted = false;
+if (typeof state.timerSeconds === 'undefined') state.timerSeconds = 0;
+
+function money(v) {
+  return 'R$ ' + Number(v || 0).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+}
+
+function save() {
+  try {
+    var toSave = {};
+    for (var k in state) {
+      if (k !== 'timerInterval') toSave[k] = state[k];
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  } catch(e) {}
+  render();
+}
+
+function toast(msg, isWarn) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isWarn ? ' warn' : '');
+  setTimeout(function() { el.className = 'toast'; }, 2500);
+}
+
+function total() { return Number(state.bank) + Number(state.cash); }
+
+function addRecord(job, amount, note, destination) {
+  amount = Number(amount);
+  if (!amount || amount <= 0) { toast('Valor invalido!'); return false; }
+  if (!note) note = '';
+  if (destination === 'bank') state.bank += amount;
+  else state.cash += amount;
+  state.earned += amount;
+  state.history.unshift({
+    job: job, amount: amount, note: note,
+    date: new Date().toLocaleString('pt-BR')
+  });
+  save();
+  toast('+ ' + money(amount) + ' registrado!');
+  return true;
+}
+
+// ===== META =====
+function saveMeta() {
+  var v = Number(document.getElementById('meta-input').value);
+  if (!v || v <= 0) { toast('Digite um valor valido!'); return; }
+  state.meta = v;
+  document.getElementById('meta-input').value = '';
+  save();
+  toast('Meta definida: ' + money(v));
+}
+
+// ===== REGISTRO RAPIDO =====
+function quickRegister() {
+  var job = document.getElementById('quick-job').value;
+  var amount = document.getElementById('quick-amount').value;
+  var note = document.getElementById('quick-note').value;
+  if (addRecord(job, amount, note)) {
+    document.getElementById('quick-amount').value = '';
+    document.getElementById('quick-note').value = '';
+  }
+}
+
+// ===== REGISTRO POR EMPREGO =====
+function registerByJob() {
+  var job = document.getElementById('reg-job-select').value;
+  var amount = document.getElementById('reg-amount').value;
+  var note = document.getElementById('reg-note').value;
+  if (addRecord(job, amount, note)) {
+    document.getElementById('reg-amount').value = '';
+    document.getElementById('reg-note').value = '';
+  }
+}
+
+// ===== REGISTRO FIXO =====
+function fixedRegister(name, val) { addRecord(name, val, ''); }
+
+// ===== ASTRONAUTA =====
+function registerAstro() {
+  var h = Number(document.getElementById('astro-hours').value);
+  if (!h || h <= 0) { toast('Digite as horas!'); return; }
+  var val = h * 6900;
+  if (addRecord('Astronauta', val, h + ' hora(s) → Banco', 'bank')) {
+    document.getElementById('astro-hours').value = '';
+  }
+}
+
+// ===== DEPOSITO =====
+function doDeposit() {
+  var v = Number(document.getElementById('deposit-input').value);
+  if (!v || v <= 0) { toast('Valor invalido!'); return; }
+  if (v > state.cash) { toast('Sem dinheiro suficiente!'); return; }
+  state.cash -= v; state.bank += v;
+  state.history.unshift({ job: 'Deposito', amount: v, note: 'Mao -> Banco', date: new Date().toLocaleString('pt-BR') });
+  document.getElementById('deposit-input').value = '';
+  save(); toast('Depositado: ' + money(v));
+}
+
+var balanceEditTarget = null;
+
+function openBalanceModal(target) {
+  balanceEditTarget = target;
+  var isCash = target === 'cash';
+  document.getElementById('balance-modal-title').textContent = isCash ? 'Ajustar dinheiro na mão' : 'Ajustar saldo do banco';
+  document.getElementById('balance-modal-subtitle').textContent = isCash ? 'Atualize o valor que está com você.' : 'Atualize o saldo disponível no banco.';
+  document.getElementById('balance-modal-icon').textContent = isCash ? '💵' : '🏦';
+  document.getElementById('balance-current-value').textContent = money(isCash ? state.cash : state.bank);
+  document.getElementById('balance-input').value = isCash ? state.cash : state.bank;
+  document.getElementById('balance-modal').classList.add('show');
+}
+
+function closeBalanceModal() {
+  document.getElementById('balance-modal').classList.remove('show');
+  balanceEditTarget = null;
+}
+
+function saveBalanceAdjustment() {
+  var input = document.getElementById('balance-input');
+  var value = Number(input.value);
+  if (input.value === '' || !isFinite(value) || value < 0) { toast('Digite um saldo valido!'); return; }
+  if (balanceEditTarget === 'cash') {
+    state.cash = value;
+  } else if (balanceEditTarget === 'bank') {
+    state.bank = value;
+  } else {
+    closeBalanceModal();
+    return;
+  }
+  var target = balanceEditTarget;
+  closeBalanceModal();
+  save();
+  toast(target === 'cash' ? 'Dinheiro na mao atualizado!' : 'Saldo do banco atualizado!');
+}
+
+function adjustCash() { openBalanceModal('cash'); }
+function adjustBank() { openBalanceModal('bank'); }
+
+// ===== EMPREGOS =====
+function addJob() {
+  var name = document.getElementById('new-job-name').value.trim();
+  var val = document.getElementById('new-job-value').value.trim() || 'Variavel';
+  if (!name) { toast('Digite o nome do emprego!'); return; }
+  state.jobs.push({ name: name, value: val });
+  document.getElementById('new-job-name').value = '';
+  document.getElementById('new-job-value').value = '';
+  save();
+  toast('Emprego "' + name + '" adicionado!');
+}
+
+function removeJob(idx) {
+  if (confirm('Remover o emprego "' + state.jobs[idx].name + '"?')) {
+    state.jobs.splice(idx, 1);
+    save();
+    toast('Emprego removido');
+  }
+}
+
+// ===== CRONOMETRO =====
+function formatTime(sec) {
+  var h = Math.floor(sec / 3600);
+  var m = Math.floor((sec % 3600) / 60);
+  var s = sec % 60;
+  return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+
+function updateTimerDisplay() {
+  document.getElementById('timer-display').textContent = formatTime(state.timerSeconds);
+  var warn = document.getElementById('timer-warning');
+  if (state.timerSeconds >= 3600) {
+    warn.classList.add('show');
+    document.getElementById('timer-status').textContent = 'PASSOU DE 1 HORA!';
+    if (!state.hourAlerted) {
+      state.hourAlerted = true;
+      toast('ATENCAO: 1 HORA DE JOGO!', true);
+      try { playAlarm(); } catch(e) {}
+      save();
+    }
+  } else if (state.timerSeconds >= 1800) {
+    document.getElementById('timer-status').textContent = 'Ja se foram 30 minutos...';
+  } else if (state.timerRunning) {
+    document.getElementById('timer-status').textContent = 'Jogo em andamento...';
+  } else {
+    document.getElementById('timer-status').textContent = 'Pausado';
+  }
+}
+
+function playAlarm() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    osc.start();
+    setTimeout(function() {
+      osc.frequency.value = 660;
+      setTimeout(function() { osc.stop(); }, 300);
+    }, 300);
+  } catch(e) {}
+}
+
+function startTimer() {
+  if (state.timerRunning) return;
+  state.timerRunning = true;
+  document.getElementById('timer-start-btn').textContent = 'Em andamento...';
+  state.timerInterval = setInterval(function() {
+    state.timerSeconds++;
+    updateTimerDisplay();
+    if (state.timerSeconds % 30 === 0) save();
+  }, 1000);
+  toast('Cronometro iniciado!');
+}
+
+function pauseTimer() {
+  if (!state.timerRunning) return;
+  state.timerRunning = false;
+  clearInterval(state.timerInterval);
+  document.getElementById('timer-start-btn').textContent = 'Continuar';
+  save();
+  toast('Cronometro pausado em ' + formatTime(state.timerSeconds));
+}
+
+function resetTimer() {
+  if (state.timerSeconds > 60) {
+    state.sessions.unshift({
+      duration: state.timerSeconds,
+      date: new Date().toLocaleString('pt-BR')
+    });
+    if (state.sessions.length > 20) state.sessions.pop();
+  }
+  clearInterval(state.timerInterval);
+  state.timerRunning = false;
+  state.timerSeconds = 0;
+  state.hourAlerted = false;
+  document.getElementById('timer-start-btn').textContent = 'Iniciar';
+  document.getElementById('timer-warning').classList.remove('show');
+  save();
+  toast('Cronometro zerado');
+}
+
+// ===== ROTA DE METAIS =====
+function formatMetalQuantity(value) {
+  return Math.floor(Math.max(0, Number(value) || 0)).toLocaleString('pt-BR') + ' metais';
+}
+
+function getMetalPayPerRoute() {
+  var vip = document.getElementById('metal-vip').value;
+  if (vip === 'gold') return 800;
+  return Math.max(0, Math.floor(Number(document.getElementById('metal-custom-pay').value) || 0));
+}
+
+function updateMetalVip() {
+  var custom = document.getElementById('metal-vip').value === 'custom';
+  document.getElementById('metal-custom-row').style.display = custom ? 'block' : 'none';
+  calculateMetalRoutes();
+}
+
+function calculateMetalRoutes() {
+  var pay = getMetalPayPerRoute();
+  var target = Math.max(0, Math.floor(Number(document.getElementById('metal-target').value) || 0));
+  var planned = Math.max(0, Math.floor(Number(document.getElementById('metal-route-count').value) || 0));
+  var neededEl = document.getElementById('metal-needed');
+  var neededNoteEl = document.getElementById('metal-needed-note');
+  var plannedTotalEl = document.getElementById('metal-planned-total');
+  var plannedNoteEl = document.getElementById('metal-planned-note');
+
+  if (pay > 0 && target > 0) {
+    var needed = Math.ceil(target / pay);
+    var achieved = needed * pay;
+    neededEl.textContent = needed + (needed === 1 ? ' rota' : ' rotas');
+    neededNoteEl.textContent = formatMetalQuantity(achieved) + ' no total' + (achieved > target ? ' (sobram ' + formatMetalQuantity(achieved - target) + ')' : '');
+  } else {
+    neededEl.textContent = '—';
+    neededNoteEl.textContent = pay > 0 ? 'Informe a meta desejada em metais.' : 'Informe quantos metais este VIP paga por rota.';
+  }
+
+  if (pay > 0 && planned > 0) {
+    var plannedTotal = planned * pay;
+    plannedTotalEl.textContent = formatMetalQuantity(plannedTotal);
+    if (target > 0 && plannedTotal < target) {
+      plannedNoteEl.textContent = 'Faltam ' + formatMetalQuantity(target - plannedTotal) + ' para a meta.';
+    } else if (target > 0) {
+      plannedNoteEl.textContent = 'Meta alcançada; sobram ' + formatMetalQuantity(plannedTotal - target) + '.';
+    } else {
+      plannedNoteEl.textContent = planned + (planned === 1 ? ' rota' : ' rotas') + ' × ' + formatMetalQuantity(pay) + ' por rota.';
+    }
+  } else {
+    plannedTotalEl.textContent = '—';
+    plannedNoteEl.textContent = pay > 0 ? 'Informe quantas rotas pretende fazer.' : 'Informe quantos metais este VIP paga por rota.';
+  }
+}
+
+// ===== VENDAS =====
+function renderProductCards(products, containerId, type) {
+  var container = document.getElementById(containerId);
+  if (!container) return;
+  if (!products.length) {
+    container.innerHTML = '<div class="drug-empty"><div class="drug-empty-icon">📋</div><h3>Sem produtos cadastrados</h3><p>Envie a tabela de preços para montar o catálogo.</p></div>';
+    return;
+  }
+  var html = '';
+  for (var i = 0; i < products.length; i++) {
+    var product = products[i];
+    var existingInput = document.getElementById('sale-qty-' + type + '-' + i);
+    var quantity = existingInput && Number(existingInput.value) > 0 ? Math.floor(Number(existingInput.value)) : 1;
+    html += '<div class="sale-card">' +
+      '<div class="sale-card-top"><div><div class="sale-tag">' + product.type + '</div><div class="sale-name">' + product.name + '</div></div>' +
+      '<div class="sale-icon">' + product.icon + '</div></div>' +
+      '<div class="sale-price">' + money(product.price) + '</div>' +
+      '<div class="sale-unit">por unidade</div>' +
+      '<div class="sale-controls"><div><label for="sale-qty-' + type + '-' + i + '">Quantidade</label>' +
+      '<input class="sale-qty" id="sale-qty-' + type + '-' + i + '" type="number" min="1" step="1" value="' + quantity + '" oninput="updateSaleTotal(\'' + type + '\',' + i + ')"></div>' +
+      '<button class="btn-primary" onclick="sellProduct(\'' + type + '\',' + i + ')">Registrar venda</button></div>' +
+      '<div class="sale-total" id="sale-total-' + type + '-' + i + '">Total desta venda: <strong>' + money(product.price * quantity) + '</strong></div>' +
+      '</div>';
+  }
+  container.innerHTML = html;
+}
+
+function renderSalesCatalogs() {
+  renderProductCards(WEAPON_PRODUCTS, 'weapons-grid', 'weapon');
+  renderProductCards(DRUG_PRODUCTS, 'drugs-grid', 'drug');
+}
+
+function updateSaleTotal(type, index) {
+  var products = type === 'weapon' ? WEAPON_PRODUCTS : DRUG_PRODUCTS;
+  var product = products[index];
+  var input = document.getElementById('sale-qty-' + type + '-' + index);
+  var output = document.getElementById('sale-total-' + type + '-' + index);
+  if (!product || !input || !output) return;
+  var quantity = Math.max(0, Math.floor(Number(input.value) || 0));
+  output.innerHTML = 'Total desta venda: <strong>' + money(product.price * quantity) + '</strong>';
+}
+
+function sellProduct(type, index) {
+  var products = type === 'weapon' ? WEAPON_PRODUCTS : DRUG_PRODUCTS;
+  var product = products[index];
+  var input = document.getElementById('sale-qty-' + type + '-' + index);
+  if (!product || !input) return;
+  var quantity = Math.floor(Number(input.value));
+  if (!quantity || quantity < 1) { toast('Informe uma quantidade valida!'); return; }
+  var amount = product.price * quantity;
+  if (addRecord('Venda: ' + product.name, amount, quantity + ' unidade(s) • ' + money(product.price) + ' cada')) {
+    var refreshedInput = document.getElementById('sale-qty-' + type + '-' + index);
+    if (refreshedInput) refreshedInput.value = 1;
+    updateSaleTotal(type, index);
+  }
+}
+
+// ===== HISTORICO =====
+function clearHistory() {
+  if (confirm('Apagar historico? Saldos nao mudam.')) {
+    state.history = []; state.earned = 0; save();
+  }
+}
+
+// ===== RENDER =====
+function render() {
+  var t = total();
+  var meta = state.meta || 0;
+  var pct = meta > 0 ? Math.min(100, (t / meta) * 100) : 0;
+  var missing = Math.max(0, meta - t);
+
+  document.getElementById('hero-total').textContent = money(t);
+  document.getElementById('hero-title').textContent = meta ? 'Progresso da Meta' : 'Defina sua Meta';
+  document.getElementById('hero-label').textContent = meta ? 'Meta atual' : 'Bem-vindo';
+  document.getElementById('stat-bank').textContent = money(state.bank);
+  document.getElementById('stat-cash').textContent = money(state.cash);
+  document.getElementById('stat-earned').textContent = money(state.earned);
+  document.getElementById('stat-missing').textContent = meta ? money(missing) : '—';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct.toFixed(1).replace('.', ',') + '%';
+  document.getElementById('meta-info').textContent = meta ? 'Meta: ' + money(meta) : 'Defina abaixo';
+
+  // Job dropdowns
+  var quickSel = document.getElementById('quick-job');
+  var regSel = document.getElementById('reg-job-select');
+  var opts = '';
+  for (var i = 0; i < state.jobs.length; i++) {
+    opts += '<option>' + state.jobs[i].name + '</option>';
+  }
+  quickSel.innerHTML = opts;
+  regSel.innerHTML = opts;
+
+  // Job list
+  var jobHtml = '';
+  for (var j = 0; j < state.jobs.length; j++) {
+    jobHtml += '<div class="job-item">' +
+      '<div><div class="job-item-name">' + state.jobs[j].name + '</div>' +
+      '<div class="job-item-val">' + state.jobs[j].value + '</div></div>' +
+      '<button class="job-del" onclick="removeJob(' + j + ')">X</button>' +
+      '</div>';
+  }
+  document.getElementById('job-list').innerHTML = jobHtml || '<div class="empty">Nenhum emprego.</div>';
+
+  // Routine
+  var routineHtml = '';
+  for (var r = 0; r < DEFAULT_ROUTINE.length; r++) {
+    routineHtml += '<div class="routine-item">' +
+      '<span class="routine-time">' + DEFAULT_ROUTINE[r].time + '</span>' +
+      '<span class="routine-name">' + DEFAULT_ROUTINE[r].name + '</span>' +
+      '<span class="routine-pay">' + DEFAULT_ROUTINE[r].pay + '</span></div>';
+  }
+  document.getElementById('routine-list').innerHTML = routineHtml;
+
+  // History
+  var histHtml = '';
+  if (state.history.length === 0) {
+    histHtml = '<div class="empty">Nenhum registro ainda.</div>';
+  } else {
+    for (var h = 0; h < state.history.length; h++) {
+      var item = state.history[h];
+      histHtml += '<div class="history-item">' +
+        '<div class="history-top"><span class="history-name">' + item.job + '</span>' +
+        '<span class="history-amount">+' + money(item.amount) + '</span></div>' +
+        '<div class="history-meta">' + (item.note || '') + ' • ' + item.date + '</div></div>';
+    }
+  }
+  document.getElementById('history-list').innerHTML = histHtml;
+
+  // Sessions
+  var sessHtml = '';
+  if (state.sessions.length === 0) {
+    sessHtml = '<div class="empty">Nenhuma sessao registrada.</div>';
+  } else {
+    for (var s = 0; s < state.sessions.length; s++) {
+      sessHtml += '<div class="history-item">' +
+        '<div class="history-top"><span class="history-name">Sessao de jogo</span>' +
+        '<span class="history-amount" style="color:var(--purple)">' + formatTime(state.sessions[s].duration) + '</span></div>' +
+        '<div class="history-meta">' + state.sessions[s].date + '</div></div>';
+    }
+  }
+  document.getElementById('sessions-list').innerHTML = sessHtml;
+
+  renderSalesCatalogs();
+  updateTimerDisplay();
+}
+
+// ===== CLOCK =====
+function tickClock() {
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+tickClock();
+setInterval(tickClock, 1000);
+
+// ===== NAV =====
+var navBtns = document.querySelectorAll('.nav-btn');
+for (var n = 0; n < navBtns.length; n++) {
+  navBtns[n].addEventListener('click', function() {
+    for (var i = 0; i < navBtns.length; i++) navBtns[i].classList.remove('active');
+    this.classList.add('active');
+    var pages = document.querySelectorAll('.tab-page');
+    for (var p = 0; p < pages.length; p++) pages[p].classList.remove('active');
+    document.getElementById('page-' + this.getAttribute('data-page')).classList.add('active');
+  });
+}
+
+// If timer was running, keep it going
+if (state.timerRunning) {
+  state.timerRunning = false;
+  startTimer();
+}
+
+render();
+</script>
+</body>
+</html>
